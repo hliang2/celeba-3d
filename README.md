@@ -7,7 +7,7 @@
 [![Dataset](https://img.shields.io/badge/Dataset-Coming_Soon-lightgrey?style=for-the-badge&logo=databases&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-Non--Commercial-orange?style=for-the-badge)](LICENSE)
 
-**High-fidelity 3D avatars from single in-the-wild images with topological consistency.**
+**High-fidelity 3D avatars from single in-the-wild images.**
 
 </div>
 
