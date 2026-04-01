@@ -321,44 +321,51 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const gridContainer = document.getElementById('video-grid');
-            const TOTAL_CARDS = 30; // 5 columns x 6 rows = 30 items
+            const TOTAL_CARDS = 30;
             let gridHTML = '';
-
+        
             for (let i = 0; i < TOTAL_CARDS; i++) {
-                // Format number with leading zeros (e.g., 00000)
                 const paddedId = String(i).padStart(5, '0');
-                
                 const imgSrc = `images/${paddedId}.jpg`;
                 const vidSrc = `videos/${paddedId}.mp4`;
-
+        
                 gridHTML += `
                     <div class="card">
-                        <!-- Top: Original Image -->
                         <div class="media-container" data-placeholder="${imgSrc} (Missing)">
                             <div class="badge">Input</div>
-                            <!-- 
-                                Note: The onerror event hides the broken image icon and reveals 
-                                the patterned background and data-placeholder text behind it.
-                            -->
                             <img src="${imgSrc}" alt="Input Image ${paddedId}" 
                                  onerror="this.style.opacity='0'">
                         </div>
-
-                        <!-- Bottom: Generated 3D Video -->
                         <div class="media-container" data-placeholder="${vidSrc} (Missing)">
                             <div class="badge accent">3D Avatar</div>
-                            <!-- Autoplay, loop, muted, playsinline, NO controls -->
-                            <video src="${vidSrc}" 
-                                   autoplay loop muted playsinline 
+                            <video data-src="${vidSrc}" 
+                                   loop muted playsinline 
                                    onerror="this.style.opacity='0'">
                             </video>
                         </div>
                     </div>
                 `;
             }
-
-            // Inject all generated cards into the DOM
+        
             gridContainer.innerHTML = gridHTML;
+        
+            // Hover to play, leave to pause
+            document.querySelectorAll('.card').forEach(card => {
+                const video = card.querySelector('video');
+                if (!video) return;
+        
+                card.addEventListener('mouseenter', () => {
+                    // Load src on first hover
+                    if (!video.src && video.dataset.src) {
+                        video.src = video.dataset.src;
+                    }
+                    video.play();
+                });
+        
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                });
+            });
         });
     </script>
 </body>
