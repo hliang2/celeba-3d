@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CelebA-3D: A Large-Scale 3D In-the-Wild Face Dataset</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Reset & Base Variables */
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #3b82f6;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.12);
+            --border-light: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Container Layouts */
+        .container-sm {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .container-lg {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            text-align: center;
+            padding: 5rem 0 3rem;
+            border-bottom: 1px solid var(--border-light);
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        /* 3D Perspective Title Effect */
+        .title-3d-wrapper {
+            perspective: 1000px;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+        }
+
+        .title-3d {
+            display: inline-block;
+            font-size: clamp(2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.1;
+            transform: rotateX(12deg) scaleY(0.95);
+            transform-style: preserve-3d;
+            /* 3D Drop Shadow effect to simulate thickness */
+            text-shadow: 
+                0 1px 0 #cbd5e1, 
+                0 2px 0 #94a3b8, 
+                0 3px 0 #64748b, 
+                0 10px 25px rgba(0,0,0,0.15);
+            letter-spacing: -1px;
+        }
+
+        .description {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        /* Authors Area */
+        .authors {
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .authors a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .authors a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .authors sup {
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+
+        .affiliations {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        /* Buttons Row */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.4rem;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid var(--border-light);
+            border-radius: 9999px; /* Pill shape */
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .btn:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-color: #cbd5e1;
+        }
+
+        /* --- Gallery Section --- */
+        .gallery-section {
+            padding: 4rem 0 6rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            color: #0f172a;
+        }
+
+        /* 5x6 CSS Grid */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.25rem; /* Small gap between cards */
+        }
+
+        /* Video Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        /* Hover Lift Effect */
+        .card:hover {
+            transform: scale(1.025) translateY(-6px);
+            box-shadow: var(--card-shadow-hover);
+            z-index: 10;
+        }
+
+        /* Media Containers inside the Card */
+        .media-container {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Square / Portrait base */
+            position: relative;
+            background-color: #f8fafc;
+            /* A subtle checkerboard placeholder for missing assets */
+            background-image: 
+                linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9),
+                linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            overflow: hidden;
+        }
+
+        /* Display missing filename if asset fails to load */
+        .media-container::after {
+            content: attr(data-placeholder);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.8rem;
+            z-index: 1;
+            pointer-events: none;
+            text-align: center;
+            width: 90%;
+            word-wrap: break-word;
+        }
+
+        /* Media Elements */
+        .media-container img, 
+        .media-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2; /* Sit above the placeholder background */
+            transition: opacity 0.3s ease;
+        }
+
+        /* Divider between top image and bottom video */
+        .media-container:first-child {
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        /* Overlay Badges (e.g., "Input", "3D Avatar") */
+        .badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(15, 23, 42, 0.7);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 10;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .badge.accent {
+            background: rgba(59, 130, 246, 0.85); /* Blue accent for generation */
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            .video-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 992px) {
+            .video-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .video-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero { padding: 3rem 0 2rem; }
+        }
+        @media (max-width: 480px) {
+            .video-grid { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container-sm">
+            <div class="title-3d-wrapper">
+                <h1 class="title-3d">CelebA-3D: A Large-Scale 3D<br>In-the-Wild Face Dataset</h1>
+            </div>
+            
+            <p class="description">Reconstructing high-fidelity 3D avatars from in-the-wild images with unprecedented detail and topological consistency.</p>
+            
+            <div class="authors">
+                <a href="#">Jane Doe</a><sup>1</sup>,
+                <a href="#">John Smith</a><sup>1,2</sup>,
+                <a href="#">Alice Johnson</a><sup>2</sup>,
+                <a href="#">Bob Williams</a><sup>1</sup>
+            </div>
+            
+            <div class="affiliations">
+                <sup>1</sup>Visual Computing Lab, <sup>2</sup>University of Technology
+            </div>
+            
+            <div class="buttons">
+                <a href="#" class="btn">📄 Paper</a>
+                <a href="#" class="btn">💻 Code</a>
+                <a href="#" class="btn">🗄️ Dataset</a>
+                <a href="#" class="btn">📝 BibTeX</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Gallery Section -->
+    <main>
+        <section class="gallery-section">
+            <div class="container-lg">
+                <h2 class="section-title">Generated 3D Avatars</h2>
+                
+                <!-- 5x6 Grid Container -->
+                <div class="video-grid" id="video-grid">
+                    <!-- Cards will be injected here via JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Script to Generate Video Grid dynamically -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridContainer = document.getElementById('video-grid');
+            const TOTAL_CARDS = 30; // 5 columns x 6 rows = 30 items
+            let gridHTML = '';
+
+            for (let i = 0; i < TOTAL_CARDS; i++) {
+                // Format number with leading zeros (e.g., 00000)
+                const paddedId = String(i).padStart(5, '0');
+                
+                const imgSrc = `images/${paddedId}.jpg`;
+                const vidSrc = `videos/${paddedId}.mp4`;
+
+                gridHTML += `
+                    <div class="card">
+                        <!-- Top: Original Image -->
+                        <div class="media-container" data-placeholder="${imgSrc} (Missing)">
+                            <div class="badge">Input</div>
+                            <!-- 
+                                Note: The onerror event hides the broken image icon and reveals 
+                                the patterned background and data-placeholder text behind it.
+                            -->
+                            <img src="${imgSrc}" alt="Input Image ${paddedId}" 
+                                 onerror="this.style.opacity='0'">
+                        </div>
+
+                        <!-- Bottom: Generated 3D Video -->
+                        <div class="media-container" data-placeholder="${vidSrc} (Missing)">
+                            <div class="badge accent">3D Avatar</div>
+                            <!-- Autoplay, loop, muted, playsinline, NO controls -->
+                            <video src="${vidSrc}" 
+                                   autoplay loop muted playsinline 
+                                   onerror="this.style.opacity='0'">
+                            </video>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Inject all generated cards into the DOM
+            gridContainer.innerHTML = gridHTML;
+        });
+    </script>
+</body>
+</html>
